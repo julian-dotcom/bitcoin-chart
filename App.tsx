@@ -1,39 +1,42 @@
-import { StyleSheet, Text, View, Image } from "react-native";
-import Chart from "./app/components/Chart";
-import TimeButton from "./app/components/TimeButton";
-import { data } from "./app/data";
-import { TIMEWINDOWS, fetchAllBtcData } from "./app/utils";
-import { useState, useEffect } from "react";
 import { BitcoinPrice } from "./app/types";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { TIMEWINDOWS, DEFAULT_WINDOW, fetchAllBtcData } from "./app/utils";
+import { useState, useEffect } from "react";
+import Chart from "./app/components/Chart";
+import PriceChange from "./app/components/PriceChange";
+import TimeButton from "./app/components/TimeButton";
 
 export default function App() {
   const [allData, setAllData] = useState<Record<string, BitcoinPrice[]>>({}); // object with data for different windows
   const [selData, setSelData] = useState<BitcoinPrice[]>([]); // selected data to visualize
-  const [selWindow, setSelWindow] = useState(TIMEWINDOWS[0].window); // store which time window is selected
+  const [selWindow, setSelWindow] = useState<string>(DEFAULT_WINDOW); // store which time window is selected
   const [curPrice, setCurPrice] = useState<number>();
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchAllBtcData();
       setAllData(data);
-      setCurPrice(allData["6h"].slice(-1)[0].value);
+      const recentCandle = data["6h"]?.slice(-1)[0]?.value;
+      setCurPrice(recentCandle ? recentCandle : undefined);
     };
     fetchData();
   }, []);
 
   useEffect(() => {
-    setSelData(allData[selWindow]);
+    if (selWindow in allData && allData[selWindow]?.length) {
+      setSelData(allData[selWindow] as BitcoinPrice[]);
+    }
   }, [allData, selWindow]);
-  console.log(curPrice);
+
   return (
     <View style={styles.box}>
       <View style={styles.textBox}>
         <View style={styles.bitcoin}>
-          <Image source={require("./app/assets/bitcoin.png")} style={{ width: 30, height: 30 }} />
+          <Image source={require("./app/assets/bitcoin.png")} style={styles.logo} />
           <Text style={styles.titleText}>Bitcoin</Text>
         </View>
         <Text style={styles.priceText}>{!!curPrice ? `$${curPrice.toLocaleString()}` : "NaN"}</Text>
-        <Text style={styles.priceChangeText}>+23%</Text>
+        <PriceChange selData={selData} />
       </View>
       {selData?.length ? <Chart data={selData} /> : <Text>Loading...</Text>}
       <View style={styles.btnBox}>
@@ -70,29 +73,16 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     gap: 7,
   },
-  tinyLogo: {
-    width: 50,
-    height: 50,
+  logo: {
+    width: 30,
+    height: 30,
   },
   priceText: {
     fontSize: 30,
     color: "grey",
   },
-  priceChangeText: {
-    fontSize: 15,
-    color: "grey",
-  },
   btnBox: {
     flexDirection: "row",
     gap: 10,
-  },
-  redText: {
-    color: "#FF1744",
-  },
-  greenText: {
-    color: "#00C853",
-  },
-  zeroText: {
-    color: "grey",
   },
 });

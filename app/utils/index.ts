@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BitcoinPrice } from "../types";
+
 export const BITCOIN_COLOR = "#F7931A";
 const BITCOIN_MARKET = "BTCUSDT";
 const MAX_CANDLES = 400;
@@ -12,7 +13,9 @@ export const TIMEWINDOWS = [
   { window: "1m", candle: "8h", candlesNeeded: 90 },
   { window: "1y", candle: "1d", candlesNeeded: 365 }, // 1y is filtered in function below
 ];
+export const DEFAULT_WINDOW = "6h";
 
+// Fetch data for all time windows, generate object as output
 export const fetchAllBtcData = async () => {
   let sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   const data: Record<string, BitcoinPrice[]> = {};
@@ -28,6 +31,7 @@ export const fetchAllBtcData = async () => {
   return data;
 };
 
+// Fetch price data for specific time window, e.g. 6 hours, or 1 year
 const fetchBitcoinDataForWindow = async (window: string): Promise<BitcoinPrice[]> => {
   try {
     const res = await axios.get("https://api.binance.com/api/v3/klines", {
@@ -57,9 +61,3 @@ const fetchBitcoinDataForWindow = async (window: string): Promise<BitcoinPrice[]
     throw error;
   }
 };
-
-// 6h => 5m
-// 1d => 10m
-// 1w => 1hr
-// 1m => 4hr
-// 1y => 1d

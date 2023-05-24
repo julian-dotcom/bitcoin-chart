@@ -1,4 +1,3 @@
-import React from "react";
 import { LineChart } from "react-native-wagmi-charts";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BITCOIN_COLOR } from "../utils";
@@ -8,6 +7,8 @@ const Chart = ({ data }: { data: { timestamp: number; value: number }[] }) => {
     <GestureHandlerRootView>
       <LineChart.Provider data={data}>
         <LineChart>
+          {/* 
+          // @ts-ignore */}
           <LineChart.Path color={BITCOIN_COLOR} useLegacyImplementation={true}>
             <LineChart.Gradient />
           </LineChart.Path>
