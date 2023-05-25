@@ -8,7 +8,7 @@ This app was built for the technical challenge at 21Bitcoin. It utilizes react-n
 
 ## Installation
 
-Initialize the package with yarn:
+Initialize the packages with yarn:
 
 ```bash
 yarn install
