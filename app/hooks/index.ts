@@ -16,7 +16,6 @@ export const useBitcoinData = () => {
         setCurPrice(newestPrice ? newestPrice : undefined);
         setError("");
       } catch (err) {
-        console.error("Messed up", `${err}`);
         setError(`${err}`);
         setAllData({});
         setCurPrice(undefined);
