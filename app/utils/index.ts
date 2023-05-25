@@ -1,29 +1,41 @@
 import axios from "axios";
-import { BitcoinPrice } from "../types";
+import { BitcoinPrice, TimeWindow, TimeFrame } from "../types";
 
-export const BITCOIN_COLOR = "#F7931A";
+// Get today's date
+const today = new Date();
+const formatter = new Intl.DateTimeFormat("en-US", {
+  weekday: "short",
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+export const TODAY = formatter.format(today);
+
+const BINANCE_RATE_LIMIT = 50;
+const BINANCE_URL = "https://api.binance.com/api/v3/klines";
 const BITCOIN_MARKET = "BTCUSDT";
 const MAX_CANDLES = 400;
-const BINANCE_RATE_LIMIT = 50;
+const ONE_YEAR_FILTER = 7; //for 1 year chart, only keep every 7th candle
+export const BITCOIN_COLOR = "#F7931A";
 
-export const TIMEWINDOWS = [
-  { window: "6h", candle: "5m", candlesNeeded: 72 },
-  { window: "1d", candle: "15m", candlesNeeded: 96 },
-  { window: "1w", candle: "2h", candlesNeeded: 84 },
-  { window: "1m", candle: "8h", candlesNeeded: 90 },
-  { window: "1y", candle: "1d", candlesNeeded: 365 }, // 1y is filtered in function below
+export const DEFAULT_WINDOW = TimeFrame.FOUR_HOURS;
+// Need to keep amount of candles at ~50 to keep app performant
+export const TIMEWINDOWS: TimeWindow[] = [
+  { window: TimeFrame.FOUR_HOURS, candleLength: "5m", candlesNeeded: 48 },
+  { window: TimeFrame.ONE_DAY, candleLength: "30m", candlesNeeded: 48 },
+  { window: TimeFrame.ONE_WEEK, candleLength: "4h", candlesNeeded: 42 },
+  { window: TimeFrame.ONE_MONTH, candleLength: "12h", candlesNeeded: 60 },
+  { window: TimeFrame.ONE_YEAR, candleLength: "1d", candlesNeeded: 365 }, // 1y is filtered in function below
 ];
-export const DEFAULT_WINDOW = "6h";
 
-// Fetch data for all time windows, generate object as output
-export const fetchAllBtcData = async () => {
+export const fetchAllBtcDataAndFilter = async (): Promise<Record<string, BitcoinPrice[]>> => {
   let sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   const data: Record<string, BitcoinPrice[]> = {};
   for (let window of TIMEWINDOWS) {
-    const res = await fetchBitcoinDataForWindow(window.candle);
+    const res = await fetchBitcoinDataForSpecificWindow(window.candleLength);
     let filtered = res.slice(-window.candlesNeeded);
     if (window.window === "1y") {
-      filtered = filtered.filter((_, i) => i % 5 === 0); // remove every 5th candle
+      filtered = filtered.filter((_, i) => i % ONE_YEAR_FILTER === 0);
     }
     data[window.window] = filtered;
     sleep(BINANCE_RATE_LIMIT);
@@ -31,13 +43,12 @@ export const fetchAllBtcData = async () => {
   return data;
 };
 
-// Fetch price data for specific time window, e.g. 6 hours, or 1 year
-const fetchBitcoinDataForWindow = async (window: string): Promise<BitcoinPrice[]> => {
+const fetchBitcoinDataForSpecificWindow = async (candleLength: string): Promise<BitcoinPrice[]> => {
   try {
-    const res = await axios.get("https://api.binance.com/api/v3/klines", {
+    const res = await axios.get(BINANCE_URL, {
       params: {
         symbol: BITCOIN_MARKET,
-        interval: window,
+        interval: candleLength,
         limit: MAX_CANDLES,
       },
     });
@@ -57,7 +68,7 @@ const fetchBitcoinDataForWindow = async (window: string): Promise<BitcoinPrice[]
       throw new Error("Failed to fetch OHLCV data");
     }
   } catch (error) {
-    console.error(`Error fetching OHLCV data for ${window}:", ${error}`);
+    console.error(`Error fetching OHLCV data for ${candleLength}:", ${error}`);
     throw error;
   }
 };

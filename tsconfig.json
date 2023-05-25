@@ -6,7 +6,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-native",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
@@ -21,6 +23,17 @@
     "target": "esnext",
     "outDir": "lib"
   },
-  "include": ["app", ".eslintrc.js", "babel.config.js", "App.tsx"],
-  "exclude": ["node_modules", "lib", "docs", "example"]
+  "include": [
+    "app",
+    ".eslintrc.js",
+    "babel.config.js",
+    "App.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "docs",
+    "example"
+  ],
+  "extends": "expo/tsconfig.base"
 }

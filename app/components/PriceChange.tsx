@@ -16,12 +16,12 @@ const PriceChange = ({ selData }: { selData: BitcoinPrice[] }) => {
     styles.priceChangeText,
     !diff || diff === 0 ? styles.zeroText : diff > 0 ? styles.greenText : styles.redText,
   ];
-  return <Text style={style}>{!!diff ? diff : "NaN"}%</Text>;
+  return <Text style={style}>{!diff ? "NaN" : diff <= 0 ? diff : `+${diff}`}%</Text>;
 };
 
 const styles = StyleSheet.create({
   priceChangeText: {
-    fontSize: 15,
+    fontSize: 20,
     color: "grey",
   },
   redText: {

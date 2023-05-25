@@ -1,44 +1,41 @@
 import { BitcoinPrice } from "./app/types";
 import { StyleSheet, Text, View, Image } from "react-native";
-import { TIMEWINDOWS, DEFAULT_WINDOW, fetchAllBtcData } from "./app/utils";
+import { TIMEWINDOWS, DEFAULT_WINDOW, TODAY } from "./app/utils";
 import { useState, useEffect } from "react";
+import { useBitcoinData } from "./app/hooks";
 import Chart from "./app/components/Chart";
 import PriceChange from "./app/components/PriceChange";
 import TimeButton from "./app/components/TimeButton";
 
 export default function App() {
-  const [allData, setAllData] = useState<Record<string, BitcoinPrice[]>>({}); // object with data for different windows
-  const [selData, setSelData] = useState<BitcoinPrice[]>([]); // selected data to visualize
+  const { allData, curPrice, error } = useBitcoinData();
+  const [selData, setSelData] = useState<BitcoinPrice[]>([]);
   const [selWindow, setSelWindow] = useState<string>(DEFAULT_WINDOW); // store which time window is selected
-  const [curPrice, setCurPrice] = useState<number>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchAllBtcData();
-      setAllData(data);
-      const recentCandle = data["6h"]?.slice(-1)[0]?.value;
-      setCurPrice(recentCandle ? recentCandle : undefined);
-    };
-    fetchData();
-  }, []);
 
   useEffect(() => {
     if (selWindow in allData && allData[selWindow]?.length) {
       setSelData(allData[selWindow] as BitcoinPrice[]);
-    }
+    } else setSelData([]);
   }, [allData, selWindow]);
 
   return (
     <View style={styles.box}>
       <View style={styles.textBox}>
+        <Text style={styles.dateText}>{TODAY}</Text>
         <View style={styles.bitcoin}>
           <Image source={require("./app/assets/bitcoin.png")} style={styles.logo} />
-          <Text style={styles.titleText}>Bitcoin</Text>
+          <Text style={styles.textTitle}>Bitcoin</Text>
         </View>
         <Text style={styles.priceText}>{!!curPrice ? `$${curPrice.toLocaleString()}` : "NaN"}</Text>
         <PriceChange selData={selData} />
       </View>
-      {selData?.length ? <Chart data={selData} /> : <Text>Loading...</Text>}
+      {selData?.length ? (
+        <Chart data={selData} />
+      ) : !!error ? (
+        <Text style={styles.textError}>{error}</Text>
+      ) : (
+        <Text>Loading...</Text>
+      )}
       <View style={styles.btnBox}>
         {TIMEWINDOWS.map((t) => (
           <TimeButton
@@ -63,9 +60,18 @@ const styles = StyleSheet.create({
 
     paddingHorizontal: 15,
   },
-  titleText: {
+  btnBox: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  dateText: { fontSize: 20, color: "grey" },
+  logo: {
+    width: 30,
+    height: 30,
+  },
+  priceText: {
     fontSize: 30,
-    fontWeight: "bold",
+    color: "black",
   },
   textBox: {
     alignSelf: "flex-start",
@@ -73,16 +79,13 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     gap: 7,
   },
-  logo: {
-    width: 30,
-    height: 30,
+  textError: {
+    color: "red",
+    fontSize: 25,
+    paddingVertical: 30,
   },
-  priceText: {
+  textTitle: {
     fontSize: 30,
-    color: "grey",
-  },
-  btnBox: {
-    flexDirection: "row",
-    gap: 10,
+    fontWeight: "bold",
   },
 });
