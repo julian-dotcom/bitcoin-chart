@@ -1,14 +1,6 @@
-import { StyleSheet, Text, Pressable } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
-const TimeButton = ({
-  timewindow,
-  selWindow,
-  setSelWindow,
-}: {
-  timewindow: string;
-  selWindow: string;
-  setSelWindow: (selWindow: string) => void;
-}) => {
+const TimeButton = ({ timewindow, selWindow, setSelWindow }: TimeButtonProps) => {
   return (
     <Pressable
       style={[styles.btn, timewindow === selWindow && styles.selBtn]}
@@ -30,5 +22,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#c0c0c0",
   },
 });
+
+interface TimeButtonProps {
+  timewindow: string;
+  selWindow: string;
+  setSelWindow: (selWindow: string) => void;
+}
 
 export default TimeButton;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { fetchAllBtcDataAndFilter, DEFAULT_WINDOW } from "../utils";
+
 import { BitcoinPrice } from "../types";
+import { DEFAULT_WINDOW, fetchAllBtcDataAndFilter } from "../utils";
 
 export const useBitcoinData = () => {
   const [allData, setAllData] = useState<Record<string, BitcoinPrice[]>>({}); // object with data for all timedframes

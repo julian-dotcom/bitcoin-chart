@@ -1,5 +1,6 @@
-import { LineChart } from "react-native-wagmi-charts";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LineChart } from "react-native-wagmi-charts";
+
 import { BITCOIN_COLOR } from "../utils";
 
 const Chart = ({ data }: { data: { timestamp: number; value: number }[] }) => {

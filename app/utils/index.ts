@@ -1,5 +1,6 @@
 import axios from "axios";
-import { BitcoinPrice, TimeWindow, TimeFrame } from "../types";
+
+import { BitcoinPrice, TimeFrame, TimeWindow } from "../types";
 
 // Get today's date
 const today = new Date();
@@ -34,7 +35,7 @@ export const fetchAllBtcDataAndFilter = async (): Promise<Record<string, Bitcoin
   for (let window of TIMEWINDOWS) {
     const res = await fetchBitcoinDataForSpecificWindow(window.candleLength);
     let filtered = res.slice(-window.candlesNeeded);
-    if (window.window === "1y") {
+    if (window.window === TimeFrame.ONE_YEAR) {
       filtered = filtered.filter((_, i) => i % ONE_YEAR_FILTER === 0);
     }
     data[window.window] = filtered;
@@ -68,7 +69,7 @@ const fetchBitcoinDataForSpecificWindow = async (candleLength: string): Promise<
       throw new Error("Failed to fetch OHLCV data");
     }
   } catch (error) {
-    console.error(`Error fetching OHLCV data for ${candleLength}:", ${error}`);
+    console.error(`Error fetching OHLCV data for ${candleLength}: ${error}`);
     throw error;
   }
 };
