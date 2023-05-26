@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import { BitcoinPrice } from "./app/types";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { DEFAULT_WINDOW, TIMEWINDOWS, TODAY } from "./app/utils";
@@ -58,7 +57,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-
     paddingHorizontal: 15,
   },
   btnBox: {

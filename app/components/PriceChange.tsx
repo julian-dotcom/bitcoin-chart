@@ -2,7 +2,7 @@ import { BitcoinPrice } from "../types";
 import { StyleSheet, Text } from "react-native";
 
 const PriceChange = ({ selData }: { selData: BitcoinPrice[] }) => {
-  let diff: number | undefined;
+  let diff: number | undefined; // compute % price difference
   if (!!selData && selData.length !== 0) {
     const first = selData[0]?.value;
     const last = selData.slice(-1)[0]?.value;

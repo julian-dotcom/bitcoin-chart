@@ -1,5 +1,4 @@
 import axios from "axios";
-
 import { BitcoinPrice, TimeFrame, TimeWindow } from "../types";
 
 // Get today's date
