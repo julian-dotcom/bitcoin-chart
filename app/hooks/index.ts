@@ -7,7 +7,17 @@ export const useBitcoinData = () => {
   const [allData, setAllData] = useState<Record<string, BitcoinPrice[]>>({}); // object with data for all timedframes
   const [curPrice, setCurPrice] = useState<number>();
   const [error, setError] = useState("");
+  const [selectedData, setSelectedData] = useState<BitcoinPrice[]>([]); // selected data
+  const [window, setWindow] = useState<string>(DEFAULT_WINDOW); // selected time window
 
+  // Hook to set specific data when time window changes
+  useEffect(() => {
+    if (window in allData && allData[window]?.length) {
+      setSelectedData(allData[window] as BitcoinPrice[]);
+    } else setSelectedData([]);
+  }, [allData, window]);
+
+  // hook to fetch Bitcoin price data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,5 +35,5 @@ export const useBitcoinData = () => {
     fetchData();
   }, []);
 
-  return { allData, curPrice, error };
+  return { curPrice, error, selectedData, setWindow, window };
 };

@@ -1,22 +1,12 @@
-import { useState, useEffect } from "react";
-import { BitcoinPrice } from "./app/types";
 import { Image, StyleSheet, Text, View } from "react-native";
-import { DEFAULT_WINDOW, TIMEWINDOWS, TODAY } from "./app/utils";
+import { TIMEWINDOWS, TODAY } from "./app/utils";
 import { useBitcoinData } from "./app/hooks";
 import Chart from "./app/components/Chart";
 import PriceChange from "./app/components/PriceChange";
 import TimeButton from "./app/components/TimeButton";
 
 export default function App() {
-  const { allData, curPrice, error } = useBitcoinData();
-  const [selData, setSelData] = useState<BitcoinPrice[]>([]); // selected data
-  const [selWindow, setSelWindow] = useState<string>(DEFAULT_WINDOW); // selected time window
-
-  useEffect(() => {
-    if (selWindow in allData && allData[selWindow]?.length) {
-      setSelData(allData[selWindow] as BitcoinPrice[]);
-    } else setSelData([]);
-  }, [allData, selWindow]);
+  const { curPrice, error, selectedData, setWindow, window } = useBitcoinData();
 
   return (
     <View style={styles.box}>
@@ -27,10 +17,10 @@ export default function App() {
           <Text style={styles.textBitcoin}>Bitcoin</Text>
         </View>
         <Text style={styles.textPrice}>{!!curPrice ? `$${curPrice.toLocaleString()}` : "NaN"}</Text>
-        <PriceChange selData={selData} />
+        <PriceChange selData={selectedData} />
       </View>
-      {selData?.length ? (
-        <Chart data={selData} />
+      {selectedData?.length ? (
+        <Chart data={selectedData} />
       ) : !!error ? (
         <Text style={styles.textError}>{error}</Text>
       ) : (
@@ -41,8 +31,8 @@ export default function App() {
           <TimeButton
             key={t.window}
             timewindow={t.window}
-            selWindow={selWindow}
-            setSelWindow={setSelWindow}
+            selWindow={window}
+            setSelWindow={setWindow}
           />
         ))}
       </View>
